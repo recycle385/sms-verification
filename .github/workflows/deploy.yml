@@ -21,7 +21,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             # 1. 프로젝트 폴더로 이동 (폴더가 없으면 에러 방지용으로 체크 추가 가능)
-            cd ~/sms-certification
+            cd ~/sms-verification
 
             # 2. 최신 코드 가져오기
             git pull origin main
