@@ -26,8 +26,6 @@ jobs:
             # 2. 최신 코드 가져오기
             git pull origin main
 
-            export SECRETS_PATH=/home/ubuntu/caps-api-old
-
             # 3. 도커 컴포즈 실행 (절대 경로 설정이 되어 있으므로 바로 빌드)
             # --build 옵션은 코드가 변했을 때 이미지를 새로 만듭니다.
             docker compose up -d --build
