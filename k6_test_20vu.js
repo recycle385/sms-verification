@@ -12,14 +12,14 @@ export let options = {
 
 export default function () {
   // 테스트할 로컬 서버 주소 (도커 환경에 맞게 포트 확인 필요)
-  const url = "http://localhost:5000/verify/request";
+  const url = "http://localhost/verify/request";
 
   // [🚨 매우 중요 🚨]
   // 빈 문자열이나 아무 값이나 넣으면 RSA 복호화 단계에서 바로 에러(400)가 발생하여
   // 우리가 측정해야 할 IMAP 메일 검색 로직(병목 구간)까지 가지 않습니다.
   // 반드시 실제 앱(클라이언트)에서 생성된 "유효한 암호화 문자열(d)" 하나를 복사해서 넣어야 합니다.
   const payload = JSON.stringify({
-    d: "nrN6u3g7YFjJQdb_DLGZIuJZS7vkdguS9QPE2utGx2Rd4eIPWD1JO0M8A99qy-ck4qxNTmYx4tINd2CSQVdf47x-BH8XUtU4GjbT4jEhnxeRtrnmpykaenwz8YsDCUUhiRck3AVO7D4TG8gdXzxXPsnOdj4eq3rypf-5o6b03Y6AXHgpabrCWj_bhMrPxP3EY5zADVl-FB1ALsIrLmJkCBxgiSQStZZcaMU7DgnKDMuJw6OVpoMmUeT_eKidOq8EocbmmPi5oRQwzdReBGAdgMh6xqOMbeOzaC9XprF52LCKqGE7ls12VE1KRPMTqMk3nhL11DtlJ-6_943F_zILBw==",
+    d: "CWiWddsRF0HlH0GG6-iZGvgVDuP-cUFVi0oNQruNoyXG9QUa1SK9FQEuYU2Ywg0gBSm9b-L91p_xsbj8JYdTVCHR48bJ6T2cpkzi_9DL5rACcL4FKPpTHNhBBiiVgxi9RsT7DTJgSDs-yrZ3Zvj_pGlP6l9zuHckzAgVskt4nuf7hF2u9v9myvNON-PkbWEYFcn8MQK_FQOlCAA-Kb4gn2sacJR480ZdxUaF62ieeClgl457ifjr80I7i1_llRaznOrqr6aHrekxEsJj931lRF6O0xQFgQm9ECcqvckZAienkXk5g5zo3LMZUK52ZLJb_ldr7XPUf-0_Fz2bvDXP8Q==",
   });
 
   const params = {

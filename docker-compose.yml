@@ -1,16 +1,60 @@
 services:
+  # 1. Redis: 인증 코드 임시 저장소 (1GB RAM 서버를 위해 64MB로 제한)
+  redis:
+    image: redis:alpine
+    container_name: redis_cache
+    restart: unless-stopped
+    command: redis-server --maxmemory 64mb --maxmemory-policy allkeys-lru
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    networks:
+      - app-network
+
+  # 2. API 서버 (기존 index.js 실행)
   app:
     build: .
     container_name: caps_api
     restart: unless-stopped
+    command: node src/index.js # ⭐️ (추가) src 폴더 안의 index.js를 실행하도록 명시!
     environment:
       - NODE_ENV=production
       - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - REDIS_HOST=redis
     env_file:
       - .env
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     networks:
       - app-network
+    depends_on:
+      - redis
 
+  # 3. Worker 서버 (이메일 감시 전용, worker.js 실행)
+  worker:
+    build: .
+    container_name: caps_worker
+    restart: unless-stopped
+    command: node src/worker.js # ⭐️ (수정) src 폴더 안의 worker.js를 실행하도록 수정!
+    environment:
+      - NODE_ENV=production
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
+      - REDIS_HOST=redis
+    env_file:
+      - .env
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    networks:
+      - app-network
+    depends_on:
+      - redis
+
+  # 4. Nginx: 리버스 프록시
   nginx:
     image: nginx:alpine
     container_name: nginx_proxy
@@ -27,6 +71,7 @@ services:
     depends_on:
       - app
 
+  # 5. Certbot: SSL 관리
   certbot:
     image: certbot/certbot
     container_name: certbot

@@ -1,10 +1,10 @@
 {
   "name": "caps-api",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
     "test": "jest --verbose"
   },
   "keywords": [],
@@ -17,7 +17,8 @@
     "express": "^5.2.1",
     "imap-simple": "^5.1.0",
     "mailparser": "^3.9.3",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "redis": "^5.11.0"
   },
   "devDependencies": {
     "jest": "^30.3.0",

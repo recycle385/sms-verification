@@ -35,6 +35,11 @@ const config = {
     port: 993,
     tls: true,
     authTimeout: 5000,
+    keepalive: {
+      interval: 10000,
+      idleInterval: 300000,
+      forceNoop: true,
+    },
   },
 };
 
