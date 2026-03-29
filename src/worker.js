@@ -1,4 +1,6 @@
-require("dotenv").config();
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
 const redisClient = require("./utils/redis_client");
 const logger = require("./utils/logger");
 const EmailService = require("./services/email_service");
@@ -16,7 +18,7 @@ async function startWorker() {
       const values = await redisClient.mGet(keys);
       const nowSec = Math.floor(Date.now() / 1000);
 
-      // 3. 교집합 필터링 (5초 대기 끝난 유저만)
+      // 3. 교집합 필터링 (대기 끝난 유저만)
       const validSenders = keys
         .filter((key, i) => values[i] && nowSec >= Number(values[i]))
         .map((key) => key.replace("search:", ""));
@@ -29,7 +31,7 @@ async function startWorker() {
     } catch (err) {
       logger.error(`[WORKER-LOOP] 오류: ${err.message}`);
     }
-  }, 3000); // 3초 주기
+  }, 3000);
 }
 
 startWorker();

@@ -1,5 +1,5 @@
 const redis = require("redis");
-const logger = require("./logger"); // 로거 추가
+const logger = require("./logger");
 
 const redisClient = redis.createClient({
   socket: {
@@ -8,7 +8,6 @@ const redisClient = redis.createClient({
   },
 });
 
-// console 대신 logger 사용
 redisClient.on("error", (err) => logger.error(`[REDIS ERROR] ${err.message}`));
 redisClient.on("connect", () => logger.info("[REDIS] 연결 성공!"));
 

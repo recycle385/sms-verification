@@ -6,7 +6,13 @@ const VerifyService = require("../services/verify_service");
 const redisClient = require("../utils/redis_client"); // Redis 모듈 불러오기
 const logger = require("../utils/logger");
 
-router.post("/request", async (req, res) => {
+const {
+  keyLimiter,
+  requestLimiter,
+  targetLimiter,
+} = require("../utils/rate_limiter");
+
+router.post("/request", requestLimiter, async (req, res) => {
   try {
     const encryptedData = req.body.d;
     if (!encryptedData)
@@ -25,6 +31,14 @@ router.post("/request", async (req, res) => {
 
     if (!config.EMAIL_DOMAIN[carrier]) {
       return res.status(400).json({ error: "지원하지 않는 통신사입니다." });
+    }
+
+    const rlKey = `rl:req:target:${phoneNumber}`;
+    const attempts = await redisClient.incr(rlKey);
+    if (attempts === 1) await redisClient.expire(rlKey, 60);
+    if (attempts > 10) {
+      logger.warn(`[RATE-LIMIT] /request target 초과: ${phoneNumber}`);
+      return res.status(429).json({ error: "잠시 후 다시 시도해주세요." });
     }
 
     const targetSender = `${phoneNumber}@${config.EMAIL_DOMAIN[carrier]}`;
@@ -62,8 +76,7 @@ router.post("/request", async (req, res) => {
   }
 });
 
-router.post("/key", async (req, res) => {
-  // 기존 코드 동일 유지
+router.post("/key", targetLimiter, keyLimiter, async (req, res) => {
   try {
     const challengeCode = req.body.d;
     const phoneNumber = req.body.p;
@@ -84,8 +97,10 @@ router.post("/key", async (req, res) => {
     const hmacResponse = cryptoUtils.generateHmacResponse(challengeCode);
 
     const nowSec = Math.floor(Date.now() / 1000);
-    const startAt = nowSec + 5;
+    const startAt = nowSec;
     const targetSender = `${phoneNumber}@${config.EMAIL_DOMAIN[carrier]}`;
+
+    await redisClient.del(`verify:${targetSender}`);
 
     await redisClient.set(`search:${targetSender}`, startAt.toString(), {
       EX: 40,

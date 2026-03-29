@@ -1,9 +1,9 @@
 const crypto = require("crypto");
 const config = require("../config");
-const logger = require("./logger"); // 로거 추가
+const logger = require("./logger");
 
 /**
- * RSA 복호화 (PKCS1_OAEP)
+ * RSA 복호화
  */
 function decryptWithRsa(encryptedData) {
   if (!encryptedData) {
@@ -21,7 +21,6 @@ function decryptWithRsa(encryptedData) {
   try {
     logger.debug("[CRYPTO-RSA] 복호화 시도 중...");
 
-    // [수정 포인트] \n 문자열을 실제 줄바꿈 문자로 변환
     const privateKey = config.P_K_CONTENT.replace(/\\n/g, "\n");
 
     const base64 = encryptedData.replace(/-/g, "+").replace(/_/g, "/");

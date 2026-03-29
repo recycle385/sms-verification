@@ -4,6 +4,14 @@ const cryptoUtils = require("../src/utils/crypto_utils");
 // 외부 의존성(cryptoUtils)을 가짜(Mock)로 만듭니다.
 jest.mock("../src/utils/crypto_utils");
 
+// 테스트 중 콘솔 로그가 찍히지 않도록 Logger 모킹
+jest.mock("../src/utils/logger", () => ({
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+}));
+
 describe("VerifyService.validateMailData 테스트", () => {
   let serverParams;
   let mailParams;
