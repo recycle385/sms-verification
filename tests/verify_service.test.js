@@ -2,14 +2,12 @@ const VerifyService = require("../src/services/verify_service");
 const cryptoUtils = require("../src/utils/crypto_utils");
 
 // 외부 의존성(cryptoUtils)을 가짜(Mock)로 만듭니다.
-// 실제 암호화 연산을 하지 않고 우리가 원하는 결과만 반환하게 설정합니다.
 jest.mock("../src/utils/crypto_utils");
 
 describe("VerifyService.validateMailData 테스트", () => {
   let serverParams;
   let mailParams;
 
-  // 각 테스트가 실행되기 전에 기본(정상) 데이터를 세팅합니다.
   beforeEach(() => {
     serverParams = {
       sFingerprint: "finger_123",
@@ -53,5 +51,12 @@ describe("VerifyService.validateMailData 테스트", () => {
     const result = VerifyService.validateMailData(serverParams, mailParams);
     expect(result.success).toBe(false);
     expect(result.error).toBe("ChallengeCode 불일치");
+  });
+
+  it("5. HMAC이 다르면 실패해야 한다", () => {
+    mailParams.mHmac = "wrong_hmac"; // 틀린 HMAC 주입
+    const result = VerifyService.validateMailData(serverParams, mailParams);
+    expect(result.success).toBe(false);
+    expect(result.error).toBe("HMAC 불일치");
   });
 });

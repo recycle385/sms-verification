@@ -3,8 +3,13 @@ const os = require("os");
 
 const config = {
   // 기본 인증 정보
-  EMAIL_ACCOUNT: process.env.EMAIL_USER,
-  PASSWORD: process.env.EMAIL_PASSWORD,
+  GMAIL_CONFIG: {
+    clientId: process.env.GMAIL_CLIENT_ID,
+    clientSecret: process.env.GMAIL_CLIENT_SECRET,
+    refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+    userEmail: process.env.EMAIL_USER,
+  },
+
   HMAC_KEY: process.env.HMAC_KEY,
   P_K_CONTENT: process.env.P_K_CONTENT,
 

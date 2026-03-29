@@ -62,16 +62,42 @@ router.post("/request", async (req, res) => {
   }
 });
 
-router.post("/key", (req, res) => {
+router.post("/key", async (req, res) => {
   // 기존 코드 동일 유지
   try {
     const challengeCode = req.body.d;
-    if (!challengeCode)
-      return res.status(400).json({ error: "No challenge code provided" });
+    const phoneNumber = req.body.p;
+    const carrier = req.body.c;
+
+    if (!challengeCode || !phoneNumber || !carrier) {
+      return res.status(400).json({ error: "필수 데이터 누락" });
+    }
+
+    if (!config.EMAIL_DOMAIN[carrier]) {
+      return res.status(400).json({ error: "지원하지 않는 통신사" });
+    }
+
+    if (!/^\d{10,11}$/.test(phoneNumber)) {
+      return res.status(400).json({ error: "유효하지 않은 전화번호" });
+    }
+
     const hmacResponse = cryptoUtils.generateHmacResponse(challengeCode);
+
+    const nowSec = Math.floor(Date.now() / 1000);
+    const startAt = nowSec + 5;
+    const targetSender = `${phoneNumber}@${config.EMAIL_DOMAIN[carrier]}`;
+
+    await redisClient.set(`search:${targetSender}`, startAt.toString(), {
+      EX: 40,
+    });
+
+    logger.info(
+      `[API] 탐색 예약: search:${targetSender} (StartAt: ${startAt})`,
+    );
+
     return res.json({ hmac: hmacResponse });
   } catch (err) {
-    logger.error("[ERROR] 인증 라우터 오류:", err);
+    logger.error("[ERROR] /key 오류:", err);
     return res.status(500).json({ error: err.message });
   }
 });
