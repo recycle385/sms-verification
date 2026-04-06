@@ -20,7 +20,6 @@ services:
     command: node src/index.js
     environment:
       - NODE_ENV=production
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
       - REDIS_HOST=redis
     env_file:
       - .env
@@ -41,7 +40,6 @@ services:
     command: node src/worker.js
     environment:
       - NODE_ENV=production
-      - NODE_TLS_REJECT_UNAUTHORIZED=0
       - REDIS_HOST=redis
     env_file:
       - .env
